@@ -8,6 +8,8 @@ import random
 import settings
 
 from flask import Flask
+from flask import request
+
 app = Flask(__name__)
 
 RE_LINK = re.compile('<a.+?\d{4}\/\d{2}\/\d{2}\/.+?a>')
@@ -29,13 +31,24 @@ def get_posts(blog_url = 'http://dangoldin.com'):
 
     return posts
 
-@app.route('/danblogbot')
+@app.route('/danblogbot', methods=['POST'])
 def dan_blog_bot():
-    return 'Success'
+    message = request.get_json()
+
+    print message
 
     telegram_url = 'https://api.telegram.org/bot{0}/'.format(settings.TELEGRAM_TOKEN)
 
     posts = get_posts()
+
+    if '/blogme' in message['message']['text']:
+        post = random.choice(posts)
+        chat_id = message['message']['chat']['id']
+        text = '<a href="{0}">{1}</a>'.format(post[0], post[1])
+        parse_mode = 'HTML'
+        r = requests.post(telegram_url + 'sendMessage', json={'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode})
+
+    return 'Success'
 
 def test():
     r = requests.get(telegram_url + 'getMe')
@@ -55,4 +68,4 @@ def test():
             r = requests.post(telegram_url + 'sendMessage', json={'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode})
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

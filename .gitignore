@@ -63,3 +63,8 @@ target/
 
 # Private files
 settings.py
+
+# Virtualenv
+bin/
+include/
+local/
