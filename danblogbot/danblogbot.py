@@ -7,6 +7,9 @@ import random
 
 import settings
 
+from flask import Flask
+app = Flask(__name__)
+
 RE_LINK = re.compile('<a.+?\d{4}\/\d{2}\/\d{2}\/.+?a>')
 RE_HREF = re.compile('href=\"(.+)\"')
 RE_TITLE = re.compile('>(.+)<')
@@ -26,22 +29,30 @@ def get_posts(blog_url = 'http://dangoldin.com'):
 
     return posts
 
-posts = get_posts()
+@app.route('/danblogbot')
+def dan_blog_bot():
+    return 'Success'
 
-telegram_url = 'https://api.telegram.org/bot{0}/'.format(settings.TELEGRAM_TOKEN)
+    telegram_url = 'https://api.telegram.org/bot{0}/'.format(settings.TELEGRAM_TOKEN)
 
-r = requests.get(telegram_url + 'getMe')
-print json.dumps(r.json(), indent=2)
+    posts = get_posts()
 
-r = requests.get(telegram_url + 'getUpdates')
-print json.dumps(r.json(), indent=2)
+def test():
+    r = requests.get(telegram_url + 'getMe')
+    print json.dumps(r.json(), indent=2)
 
-messages = r.json()['result']
+    r = requests.get(telegram_url + 'getUpdates')
+    print json.dumps(r.json(), indent=2)
 
-for message in messages:
-    if '/blogme' in message['message']['text']:
-        post = random.choice(posts)
-        chat_id = message['message']['chat']['id']
-        text = '<a href="{0}">{1}</a>'.format(post[0], post[1])
-        parse_mode = 'HTML'
-        r = requests.post(telegram_url + 'sendMessage', json={'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode})
+    messages = r.json()['result']
+
+    for message in messages:
+        if '/blogme' in message['message']['text']:
+            post = random.choice(posts)
+            chat_id = message['message']['chat']['id']
+            text = '<a href="{0}">{1}</a>'.format(post[0], post[1])
+            parse_mode = 'HTML'
+            r = requests.post(telegram_url + 'sendMessage', json={'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode})
+
+if __name__ == '__main__':
+    app.run()
