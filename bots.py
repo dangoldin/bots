@@ -47,7 +47,7 @@ def dan_blog_bot():
         text = '<a href="{0}">{1}</a>'.format(post[0], post[1])
         parse_mode = 'HTML'
         r = requests.post(telegram_url + 'sendMessage', json={'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode})
-    else if '/help' in message['message']['text'] or '/start'  in message['message']['text']:
+    elif '/help' in message['message']['text'] or '/start'  in message['message']['text']:
         chat_id = message['message']['chat']['id']
         text = 'Just reply with /blogme to get a random blog post'
         parse_mode = 'HTML'
