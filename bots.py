@@ -4,6 +4,7 @@ import requests
 import json
 import re
 import random
+import sqlite3
 
 import settings
 
@@ -50,7 +51,7 @@ def dan_blog_bot():
 
     print message
 
-    telegram_url = 'https://api.telegram.org/bot{0}/'.format(settings.TELEGRAM_TOKEN)
+    telegram_url = 'https://api.telegram.org/bot{0}/'.format(settings.TELEGRAM_TOKEN_DANBLOG)
 
     posts = get_posts()
 
@@ -67,6 +68,28 @@ def dan_blog_bot():
         text = 'Just reply with /blogme to get a random blog post. For more fun do /blogme X where X is a number to get multiple posts (up to 10)'
         parse_mode = 'HTML'
         r = requests.post(telegram_url + 'sendMessage', json={'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode})
+
+    return 'Success'
+
+@app.route('/lifebot', methods=['POST'])
+def life_bot():
+    message = request.get_json()
+
+    print message
+
+    telegram_url = 'https://api.telegram.org/bot{0}/'.format(settings.TELEGRAM_TOKEN_LIFE)
+
+    conn = sqlite3.connect('lifebot.db')
+
+    # Create db
+    # c = conn.cursor()
+    # c.execute('''CREATE TABLE users (date text, trans text, symbol text, qty real, price real)''')
+
+    # Get/create user
+
+    # Update user records
+
+    # Randomly cron + run something
 
     return 'Success'
 
