@@ -19,6 +19,8 @@ RE_TITLE = re.compile('>(.+)<')
 
 MAX_POSTS = 10
 
+conn = sqlite3.connect('lifebot.db')
+
 def parse_post_html(base_url, html):
     link = base_url + RE_HREF.findall(html)[0]
     title = RE_TITLE.findall(html)[0]
@@ -44,6 +46,15 @@ def parse_num_posts(msg):
         except Exception as e:
             print 'Failed to parse msg', e
             return 1
+
+def get_or_create_user(username, userid):
+    c = conn.cursor()
+    sql = 'select * from users where userid = \'%s\'' % (userid)
+    c.execute(sql)
+
+
+    c.execute("INSERT INTO users (username, userid, created_date) VALUES ('%s', '%s', CURRENT_TIMESTAMP)".format(username, userid))
+    conn.commit()
 
 @app.route('/danblogbot', methods=['POST'])
 def dan_blog_bot():
@@ -79,12 +90,6 @@ def life_bot():
 
     telegram_url = 'https://api.telegram.org/bot{0}/'.format(settings.TELEGRAM_TOKEN_LIFE)
 
-    conn = sqlite3.connect('lifebot.db')
-
-    # Create db
-    # c = conn.cursor()
-    # c.execute('''CREATE TABLE users (date text, trans text, symbol text, qty real, price real)''')
-
     # Get/create user
 
     # Update user records
@@ -111,4 +116,9 @@ def test():
             r = requests.post(telegram_url + 'sendMessage', json={'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode})
 
 if __name__ == '__main__':
+    # Create db
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS users (username text PRIMARY KEY, userid integer, created_date text)''')
+    conn.commit()
+
     app.run(debug=True)
