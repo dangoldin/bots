@@ -68,3 +68,6 @@ settings.py
 bin/
 include/
 local/
+
+# DB files
+*db

@@ -4,22 +4,23 @@ import requests
 import json
 import re
 import random
-import sqlite3
 
 import settings
 
 from flask import Flask
 from flask import request
 
+from database import Database
+
 app = Flask(__name__)
+
+db = Database()
 
 RE_LINK = re.compile('<a.+?\d{4}\/\d{2}\/\d{2}\/.+?a>')
 RE_HREF = re.compile('href=\"(.+)\"')
 RE_TITLE = re.compile('>(.+)<')
 
 MAX_POSTS = 10
-
-conn = sqlite3.connect('lifebot.db')
 
 def parse_post_html(base_url, html):
     link = base_url + RE_HREF.findall(html)[0]
@@ -47,14 +48,12 @@ def parse_num_posts(msg):
             print 'Failed to parse msg', e
             return 1
 
-def get_or_create_user(username, userid):
-    c = conn.cursor()
-    sql = 'select * from users where userid = \'%s\'' % (userid)
-    c.execute(sql)
-
-
-    c.execute("INSERT INTO users (username, userid, created_date) VALUES ('%s', '%s', CURRENT_TIMESTAMP)".format(username, userid))
-    conn.commit()
+def get_or_create_user(db, username, userid):
+    data = db.get('select * from users where userid = ?', (userid,))
+    if data is None:
+        i = db.insert('INSERT INTO users (username, userid, created_date) VALUES (?, ?, CURRENT_TIMESTAMP)', (username, userid))
+        data = (i, username, userid, '')
+    return data
 
 @app.route('/danblogbot', methods=['POST'])
 def dan_blog_bot():
@@ -116,9 +115,8 @@ def test():
             r = requests.post(telegram_url + 'sendMessage', json={'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode})
 
 if __name__ == '__main__':
-    # Create db
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS users (username text PRIMARY KEY, userid integer, created_date text)''')
-    conn.commit()
+    # db.create_table('CREATE TABLE IF NOT EXISTS users (id integer PRIMARY KEY, username text, userid integer, created_date text)')
 
-    app.run(debug=True)
+    get_or_create_user(db, 'Test Name', 'Test Id')
+
+    # app.run(debug=True)
