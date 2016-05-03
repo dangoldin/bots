@@ -1,3 +1,4 @@
+APScheduler==3.1.0
 Fabric==1.11.1
 Flask==0.10.1
 Jinja2==2.8
@@ -7,5 +8,8 @@ ecdsa==0.13
 itsdangerous==0.24
 paramiko==1.16.0
 pycrypto==2.6.1
+pytz==2016.4
 requests==2.9.1
+six==1.10.0
+tzlocal==1.2.2
 wsgiref==0.1.2

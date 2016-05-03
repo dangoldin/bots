@@ -97,7 +97,9 @@ def life_bot():
 
     return 'Success'
 
-def test():
+def test_blogme():
+    telegram_url = 'https://api.telegram.org/bot{0}/'.format(settings.TELEGRAM_TOKEN_DANBLOG)
+
     r = requests.get(telegram_url + 'getMe')
     print json.dumps(r.json(), indent=2)
 
@@ -114,9 +116,27 @@ def test():
             parse_mode = 'HTML'
             r = requests.post(telegram_url + 'sendMessage', json={'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode})
 
+def test_lifebot():
+    telegram_url = 'https://api.telegram.org/bot{0}/'.format(settings.TELEGRAM_TOKEN_LIFE)
+
+    r = requests.get(telegram_url + 'getMe')
+    print json.dumps(r.json(), indent=2)
+
+    r = requests.get(telegram_url + 'getUpdates')
+    print json.dumps(r.json(), indent=2)
+
+    messages = r.json()['result']
+
+    for message in messages:
+        username = message['message']['from']['username']
+        userid = message['message']['from']['id']
+        print username, userid
+
 if __name__ == '__main__':
     # db.create_table('CREATE TABLE IF NOT EXISTS users (id integer PRIMARY KEY, username text, userid integer, created_date text)')
 
-    get_or_create_user(db, 'Test Name', 'Test Id')
+    # get_or_create_user(db, 'Test Name', 'Test Id')
 
     # app.run(debug=True)
+
+    test_lifebot()
