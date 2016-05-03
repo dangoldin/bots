@@ -63,6 +63,7 @@ target/
 
 # Private files
 settings.py
+sample_calls.txt
 
 # Virtualenv
 bin/
