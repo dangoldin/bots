@@ -23,12 +23,23 @@ class Database:
         self.conn.commit()
         self.conn.close()
 
-    def get(self, query, args):
+    def get(self, query, args = None):
+        if args is None:
+            args = tuple()
         c = self.get_cursor()
         c.execute(query, args)
         return c.fetchone()
 
-    def insert(self, query, args):
+    def get_all(self, query, args = None):
+        if args is None:
+            args = tuple()
+        c = self.get_cursor()
+        c.execute(query, args)
+        return c.fetchall()
+
+    def insert(self, query, args = None):
+        if args is None:
+            args = tuple()
         c = self.get_cursor()
         c.execute(query, args)
         self.conn.commit()
