@@ -48,23 +48,28 @@ def parse_num_posts(msg):
             print 'Failed to parse msg', e
             return 1
 
-def get_or_create_user(db, username, userid):
+def get_or_create_user(db, telegram_username, telegram_user_id):
     data = db.get('select * from users where userid = ?', (userid,))
     if data is None:
-        i = db.insert('INSERT INTO users (username, userid, created_date) VALUES (?, ?, CURRENT_TIMESTAMP)', (username, userid))
-        data = (i, username, userid, '')
+        i = db.insert('INSERT INTO users (telegram_username, telegram_user_id, created_date) VALUES (?, ?, CURRENT_TIMESTAMP)', (telegram_username, telegram_user_id))
+        data = (i, telegram_username, telegram_user_id, '')
     return data
 
-chat_id integer UNIQUE, user_id integer, active
-def get_or_create_user(db, chatid):
-    data = db.get('select * from chats where userid = ?', (userid,))
+def get_or_create_user(db, telegram_chat_id, user_id):
+    data = db.get('select * from chats where telegram_chat_id = ?', (telegram_chat_id,))
     if data is None:
-        i = db.insert('INSERT INTO chats (chat_id, user_id, active) VALUES (?, ?, 1, CURRENT_TIMESTAMP)', (username, userid))
-        data = (i, username, userid, '')
+        i = db.insert('INSERT INTO chats (telegram_chat_id, user_id, active) VALUES (?, ?, 1, CURRENT_TIMESTAMP)', (telegram_chat_id, user_id))
+        data = (i, telegram_chat_id, user_id, '')
     return data
 
 def get_users(db):
     data = db.get_all('select * from users')
+    if data is None:
+        return []
+    return data
+
+def get_user_chats(db):
+    data = db.get_all('select * from chats')
     if data is None:
         return []
     return data
@@ -167,7 +172,6 @@ def send_poll(user):
     parse_mode = 'HTML'
     r = requests.post(telegram_url + 'sendMessage', json={'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode})
 
-    print r.status_code
     if r.status_code != 200:
         print r.content
 
