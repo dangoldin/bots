@@ -49,16 +49,16 @@ def parse_num_posts(msg):
             return 1
 
 def get_or_create_user(db, telegram_username, telegram_user_id):
-    data = db.get('select * from users where userid = ?', (userid,))
+    data = db.get('select * from users where telegram_user_id = ?', (telegram_user_id,))
     if data is None:
         i = db.insert('INSERT INTO users (telegram_username, telegram_user_id, created_date) VALUES (?, ?, CURRENT_TIMESTAMP)', (telegram_username, telegram_user_id))
         data = (i, telegram_username, telegram_user_id, '')
     return data
 
-def get_or_create_user(db, telegram_chat_id, user_id):
+def get_or_create_chat(db, telegram_chat_id, user_id):
     data = db.get('select * from chats where telegram_chat_id = ?', (telegram_chat_id,))
     if data is None:
-        i = db.insert('INSERT INTO chats (telegram_chat_id, user_id, active) VALUES (?, ?, 1, CURRENT_TIMESTAMP)', (telegram_chat_id, user_id))
+        i = db.insert('INSERT INTO chats (telegram_chat_id, user_id, active, created_date) VALUES (?, ?, 1, CURRENT_TIMESTAMP)', (telegram_chat_id, user_id))
         data = (i, telegram_chat_id, user_id, '')
     return data
 
@@ -68,8 +68,8 @@ def get_users(db):
         return []
     return data
 
-def get_user_chats(db):
-    data = db.get_all('select * from chats')
+def get_chats(db):
+    data = db.get_all('select * from chats where active')
     if data is None:
         return []
     return data
@@ -147,49 +147,47 @@ def test_lifebot():
     messages = r.json()['result']
 
     for message in messages:
-        username = message['message']['from']['username']
-        userid = message['message']['from']['id']
+        telegram_username = message['message']['from']['username']
+        telegram_userid = message['message']['from']['id']
+        telegram_chatid = message['message']['chat']['id']
 
-        chatid = message
-        print username, userid
+        # telegram_chatid = message
+        print telegram_username, telegram_userid
 
-        user = get_or_create_user(db, username, userid)
+        user = get_or_create_user(db, telegram_username, telegram_userid)
 
         user_id = user[0]
 
-        get_or_create_chat(db, )
+        get_or_create_chat(db, telegram_chatid, user_id)
 
-def send_poll(user):
-    telegram_username = user[1]
-    telegram_userid = user[2]
+def send_poll(chat):
+    telegram_chat_id = chat[1]
 
-    print telegram_userid
+    print telegram_chat_id
 
-    telegram_url = 'https://api.telegram.org/bot{0}/'.format(settings.TELEGRAM_TOKEN_DANBLOG)
+    telegram_url = 'https://api.telegram.org/bot{0}/'.format(settings.TELEGRAM_TOKEN_LIFE)
 
-    chat_id = '@' + telegram_username
     text = 'How are you doing today?'
     parse_mode = 'HTML'
-    r = requests.post(telegram_url + 'sendMessage', json={'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode})
+    r = requests.post(telegram_url + 'sendMessage', json={'chat_id': telegram_chat_id, 'text': text, 'parse_mode': parse_mode})
 
     if r.status_code != 200:
         print r.content
 
 def send_polls():
-    users = get_users(db)
+    chats = get_chats(db)
 
-    for user in users:
-        send_poll(user)
+    for chat in chats:
+        send_poll(chat)
 
 if __name__ == '__main__':
     db.create_table('CREATE TABLE IF NOT EXISTS users (id integer PRIMARY KEY, telegram_username text, telegram_user_id integer UNIQUE, created_date text)')
-
     db.create_table('CREATE TABLE IF NOT EXISTS chats (id integer PRIMARY KEY, telegram_chat_id integer UNIQUE, user_id integer, active integer, created_date text)')
 
     # get_or_create_user(db, 'Test Name', 'Test Id')
 
     # app.run(debug=True)
 
-    test_lifebot()
+    # test_lifebot()
 
-    # send_polls()
+    send_polls()
