@@ -169,7 +169,8 @@ def send_poll(chat):
 
     text = 'How are you doing today?'
     parse_mode = 'HTML'
-    r = requests.post(telegram_url + 'sendMessage', json={'chat_id': telegram_chat_id, 'text': text, 'parse_mode': parse_mode})
+    reply_markup = {'resize_keyboard': False, 'one_time_keyboard': True, 'keyboard': [['Great', 'Eh', 'Terrible']]}
+    r = requests.post(telegram_url + 'sendMessage', json={'chat_id': telegram_chat_id, 'text': text, 'parse_mode': parse_mode, 'reply_markup': reply_markup})
 
     if r.status_code != 200:
         print r.content
