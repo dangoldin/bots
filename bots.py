@@ -18,7 +18,7 @@ app = Flask(__name__)
 
 db = Database()
 
-client = TwilioRestClient(account=settings['TWILIO_ACCOUNT_SID'], token=settings['TWILIO_AUTH_TOKEN'])
+client = TwilioRestClient(account=settings.TWILIO_ACCOUNT_SID, token=settings.TWILIO_AUTH_TOKEN)
 
 RE_LINK = re.compile('<a.+?\d{4}\/\d{2}\/\d{2}\/.+?a>')
 RE_HREF = re.compile('href=\"(.+)\"')
@@ -78,8 +78,10 @@ def get_chats(db):
         return []
     return data
 
-@app.route('/twilio-danblogpost')
+@app.route('/twilio-danblogpost', methods=['POST'])
 def twilio_dan_blog_bot():
+    print request
+
     posts = get_posts()
     posts = random.sample(posts, 1)
 
@@ -90,7 +92,7 @@ def twilio_dan_blog_bot():
     client.messages.create(
         body=body,
         to='12013413384',
-        from_=settings['TWILIO_NUMBER'],
+        from_=settings.TWILIO_NUMBER,
     )
 
     return 'Success'
