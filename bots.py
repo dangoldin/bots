@@ -204,7 +204,7 @@ def send_polls():
         send_poll(chat)
 
 if __name__ == '__main__':
-    -- db.create_table('CREATE TABLE IF NOT EXISTS users (id integer PRIMARY KEY, telegram_username text, telegram_user_id integer UNIQUE, created_date text)')
+    # db.create_table('CREATE TABLE IF NOT EXISTS users (id integer PRIMARY KEY, telegram_username text, telegram_user_id integer UNIQUE, created_date text)')
     # db.create_table('CREATE TABLE IF NOT EXISTS chats (id integer PRIMARY KEY, telegram_chat_id integer UNIQUE, user_id integer, active integer, created_date text)')
 
     # get_or_create_user(db, 'Test Name', 'Test Id')
