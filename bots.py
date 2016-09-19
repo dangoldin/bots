@@ -78,6 +78,10 @@ def get_chats(db):
         return []
     return data
 
+@app.route('/')
+def index():
+    return '<html><head>Bots</head><body>It works</body></html>'
+
 @app.route('/twilio-danblogpost', methods=['POST'])
 def twilio_dan_blog_bot():
     print request
