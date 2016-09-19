@@ -3,3 +3,7 @@ TELEGRAM_TOKEN_DANBLOG = ''
 TELEGRAM_TOKEN_LIFE = ''
 
 BOTS_URL = 'http://bots.dangoldin.com/'
+
+TWILIO_ACCOUNT_SID = ''
+TWILIO_AUTH_TOKEN = ''
+TWILIO_NUMBER = ''

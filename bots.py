@@ -10,11 +10,15 @@ import settings
 from flask import Flask
 from flask import request
 
+from twilio.rest import TwilioRestClient
+
 from database import Database
 
 app = Flask(__name__)
 
 db = Database()
+
+client = TwilioRestClient(account=settings['TWILIO_ACCOUNT_SID'], token=settings['TWILIO_AUTH_TOKEN'])
 
 RE_LINK = re.compile('<a.+?\d{4}\/\d{2}\/\d{2}\/.+?a>')
 RE_HREF = re.compile('href=\"(.+)\"')
@@ -74,6 +78,23 @@ def get_chats(db):
         return []
     return data
 
+@app.route('/twilio-danblogpost')
+def twilio_dan_blog_bot():
+    posts = get_posts()
+    posts = random.sample(posts, 1)
+
+    body = ''
+    for post in posts:
+        body += "{0}: {1}\n".format(post[1], post[0])
+
+    client.messages.create(
+        body=body,
+        to='12013413384',
+        from_=settings['TWILIO_NUMBER'],
+    )
+
+    return 'Success'
+
 @app.route('/danblogbot', methods=['POST'])
 def dan_blog_bot():
     message = request.get_json()
@@ -82,9 +103,8 @@ def dan_blog_bot():
 
     telegram_url = 'https://api.telegram.org/bot{0}/'.format(settings.TELEGRAM_TOKEN_DANBLOG)
 
-    posts = get_posts()
-
     if '/blogme' in message['message']['text']:
+        posts = get_posts()
         num_posts = parse_num_posts(message['message']['text'])
         posts = random.sample(posts, num_posts)
         for post in posts:
