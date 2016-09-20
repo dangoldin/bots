@@ -16,7 +16,7 @@ from database import Database
 
 app = Flask(__name__)
 
-db = Database()
+# db = Database()
 
 client = TwilioRestClient(account=settings.TWILIO_ACCOUNT_SID, token=settings.TWILIO_AUTH_TOKEN)
 
