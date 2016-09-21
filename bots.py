@@ -95,7 +95,7 @@ def twilio_dan_blog_bot():
 
     client.messages.create(
         body=body,
-        to='12013413384',
+        to=settings.TWILIO_TEST_NUMBER,
         from_=settings.TWILIO_NUMBER,
     )
 
