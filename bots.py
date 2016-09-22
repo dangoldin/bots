@@ -84,7 +84,7 @@ def index():
 
 @app.route('/twilio-danblogpost', methods=['POST'])
 def twilio_dan_blog_bot():
-    print request
+    print request, request.form, request.data
 
     posts = get_posts()
     posts = random.sample(posts, 1)
