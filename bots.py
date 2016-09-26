@@ -89,7 +89,7 @@ def twilio_dan_blog_bot():
     msg = request.form.get('Body','')
     fro = request.form.get('From','')
 
-    if 'blog' in msg and fro != '':
+    if 'blog' in msg.lower() and fro != '':
         posts = get_posts()
         posts = random.sample(posts, 1)
 
