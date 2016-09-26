@@ -86,20 +86,27 @@ def index():
 def twilio_dan_blog_bot():
     print request, request.form, request.data
 
-    posts = get_posts()
-    posts = random.sample(posts, 1)
+    msg = request.form.get('Body','')
+    fro = request.form.get('From','')
 
-    body = ''
-    for post in posts:
-        body += "{0}: {1}\n".format(post[1], post[0])
+    if 'blog' in msg and fro != '':
+        posts = get_posts()
+        posts = random.sample(posts, 1)
 
-    client.messages.create(
-        body=body,
-        to=settings.TWILIO_TEST_NUMBER,
-        from_=settings.TWILIO_NUMBER,
-    )
+        body = ''
+        for post in posts:
+            body += "{0}: {1}\n".format(post[1], post[0])
 
-    return 'Success'
+        client.messages.create(
+            body=body,
+            to=fro,
+            from_=settings.TWILIO_NUMBER,
+        )
+
+        return 'Success'
+    else:
+        print 'Unable to process msg and number', msg, fro
+        return 'Failure'
 
 @app.route('/danblogbot', methods=['POST'])
 def dan_blog_bot():
