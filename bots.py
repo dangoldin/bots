@@ -10,15 +10,12 @@ import settings
 from flask import Flask, request, Response
 
 import twilio.twiml
-from twilio.rest import TwilioRestClient
 
 from database import Database
 
 app = Flask(__name__)
 
 # db = Database()
-
-client = TwilioRestClient(account=settings.TWILIO_ACCOUNT_SID, token=settings.TWILIO_AUTH_TOKEN)
 
 RE_LINK = re.compile('<a.+?\d{4}\/\d{2}\/\d{2}\/.+?a>')
 RE_HREF = re.compile('href=\"(.+)\"')
