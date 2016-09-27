@@ -7,9 +7,9 @@ import random
 
 import settings
 
-from flask import Flask
-from flask import request
+from flask import Flask, request, Response
 
+import twilio.twiml
 from twilio.rest import TwilioRestClient
 
 from database import Database
@@ -78,6 +78,12 @@ def get_chats(db):
         return []
     return data
 
+def to_flask_response(twilio_response):
+    print 'Response', str(twilio_response)
+    resp = Response(str(twilio_response))
+    resp.headers['Content-Type'] = 'text/xml'
+    return resp
+
 @app.route('/')
 def index():
     return '<html><head>Bots</head><body>It works</body></html>'
@@ -97,16 +103,15 @@ def twilio_dan_blog_bot():
         for post in posts:
             body += "{0}: {1}\n".format(post[1], post[0])
 
-        client.messages.create(
-            body=body,
-            to=fro,
-            from_=settings.TWILIO_NUMBER,
-        )
-
-        return 'Success'
+        response = twilio.twiml.Response()
+        response.message(body)
+        response.hangup()
+        return to_flask_response(response)
     else:
-        print 'Unable to process msg and number', msg, fro
-        return 'Failure'
+        response = twilio.twiml.Response()
+        response.message('Unable to process msg {0} and number {1}'.format(str(msg), str(fro)))
+        response.hangup()
+        return to_flask_response(response)
 
 @app.route('/danblogbot', methods=['POST'])
 def dan_blog_bot():
