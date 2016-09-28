@@ -92,7 +92,7 @@ def twilio_dan_blog_bot():
     msg = request.form.get('Body','')
     fro = request.form.get('From','')
 
-    if 'blog' in msg.lower() and fro != '':
+    if 'blog' in msg.lower():
         posts = get_posts()
         posts = random.sample(posts, 1)
 
@@ -102,12 +102,10 @@ def twilio_dan_blog_bot():
 
         response = twilio.twiml.Response()
         response.message(body)
-        response.hangup()
         return to_flask_response(response)
     else:
         response = twilio.twiml.Response()
         response.message('Unable to process msg {0} and number {1}'.format(str(msg), str(fro)))
-        response.hangup()
         return to_flask_response(response)
 
 @app.route('/danblogbot', methods=['POST'])
