@@ -38,6 +38,37 @@ def get_posts(blog_url = 'http://dangoldin.com'):
 
     return posts
 
+def get_quotes(quote_url = 'https://raw.githubusercontent.com/dangoldin/quotes/master/quotes.txt'):
+    r = requests.get(quote_url)
+    c = r.content
+
+    lines = c.split("\n")
+    quotes = []
+    curr_quote = {
+        'lines': []
+    }
+    for line in lines:
+        # Add the quote
+        if line.strip() == '':
+            if 'who' not in curr_quote:
+                curr_quote['who'] = 'Unattributed'
+
+            quotes.append(curr_quote)
+            curr_quote = {
+                'lines': []
+            }
+            continue
+
+        # Attribution
+        if line.strip().startswith('-'):
+            curr_quote['who'] = line.strip().strip('-').strip()
+            continue
+
+        # Actual quote
+        curr_quote['lines'].append(line)
+
+    return quotes
+
 def parse_num_posts(msg):
     pieces = msg.split(' ')
     if len(pieces) == 0:
@@ -84,6 +115,12 @@ def to_flask_response(twilio_response):
 @app.route('/')
 def index():
     return '<html><head>Bots</head><body>It works</body></html>'
+
+@app.route('/quoteme', methods=['POST', 'GET'])
+def quote_me():
+    quotes = get_quotes()
+    quote = random.choice(quotes)
+    return '<br/'.join(quote['lines']) + '<br/>- ' + quote['who']
 
 @app.route('/twilio-danblogpost', methods=['POST'])
 def twilio_dan_blog_bot():
