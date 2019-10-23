@@ -6,7 +6,7 @@ cffi==1.12.3
 chardet==3.0.4
 Click==7.0
 cryptography==2.7
-ecdsa==0.13
+ecdsa==0.13.3
 enum34==1.1.6
 fabric==2.5.0
 Flask==1.1.1
