@@ -30,4 +30,4 @@ six==1.10.0
 twilio==5.4.0
 tzlocal==1.2.2
 urllib3==1.26.5
-Werkzeug==0.16.0
+Werkzeug==2.2.3
